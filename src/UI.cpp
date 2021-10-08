@@ -9,6 +9,8 @@ int8_t UI::touch(uint16_t x, uint16_t y, Touched touched) {
   return -1;
 }
 
+void UI::swipe(Swipe swipe) { }
+
 void UI::encoderChange(Rotation rotation) { }
 
 void UI::encoderPress(bool emergency) { }

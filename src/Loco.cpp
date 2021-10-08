@@ -2,8 +2,8 @@
 #include <Adafruit_ILI9341.h>
 #include <Functions.h>
 
-Loco::Loco(Adafruit_SPITFT *tft, SdFat *sd, DCCEx *dcc, LocoState *loco)
-    : UI(tft), _sd(sd), _dcc(dcc), _loco(loco) {
+Loco::Loco(Adafruit_SPITFT *tft, SdFat *sd, DCCEx *dcc, LocoState *loco, Swiped swiped)
+    : UI(tft), _sd(sd), _dcc(dcc), _loco(loco), _swiped(swiped) {
   char path[32];
   sprintf_P(path, PSTR("/locos/%d.json"), _loco->address);
   
@@ -188,6 +188,10 @@ int8_t Loco::touch(uint16_t x, uint16_t y, Touched touched) {
   }
 
   return -1;
+}
+
+void Loco::swipe(Swipe swipe) {
+  _swiped(swipe);
 }
 
 void Loco::encoderChange(Rotation rotation) {

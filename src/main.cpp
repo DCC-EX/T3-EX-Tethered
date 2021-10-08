@@ -80,6 +80,23 @@ int freeMemory() {
 #endif
 
 /**
+ * @brief Get the Remapped TS_Point object
+ * 
+ * @return TS_Point 
+ */
+TS_Point getRemappedTSPoint() {
+  TS_Point tp = ts.getPoint();
+  tp.x = map(tp.x, 0, 240, 240, 0);
+  tp.y = map(tp.y, 0, 320, 320, 0);
+
+  if (rotated) { // Invert touch points if rotated
+    tp.x = 240 - tp.x;
+    tp.y = 320 - tp.y;
+  }
+  return tp;
+}
+
+/**
  * @brief Get the index of the LocoState object
  * If the address isn't found in the `locos` array it'll add it to the first empty one
  * 
@@ -100,6 +117,42 @@ int8_t getLoco(uint16_t address) {
     locos[firstEmpty].address = address;
   }
   return firstEmpty;
+}
+
+/**
+ * @brief Get the next active loco index
+ * 
+ * @param index 
+ * @return int8_t 
+ */
+int8_t getNextLoco(int8_t index) {
+  for (uint8_t i = 0; i < MAX_LOCOS; i++) {
+    if (++index == MAX_LOCOS - 1) {
+      index = 0;
+    }
+    if (locos[index].address != 0) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+/**
+ * @brief Get the prev active loco index
+ * 
+ * @param index 
+ * @return int8_t 
+ */
+int8_t getPrevLoco(int8_t index) {
+  for (uint8_t i = 0; i < MAX_LOCOS; i++) {
+    if (--index == -1) {
+      index = MAX_LOCOS - 1;
+    }
+    if (locos[index].address != 0) {
+      return index;
+    }
+  }
+  return -1;
 }
 
 /**
@@ -145,7 +198,18 @@ void setUI(T&& ui) {
  */
 void setLocoUI() {
   setUI([]() {
-    return new Loco(&tft, &sd, &dcc, &locos[activeLoco]);
+    return new Loco(&tft, &sd, &dcc, &locos[activeLoco], [](Swipe swipe) {
+      int8_t loco = -1;
+      if (swipe == LEFT) {
+        loco = getNextLoco(activeLoco);
+      } else if (swipe == RIGHT) {
+        loco = getPrevLoco(activeLoco);
+      }
+      if (loco != -1 && loco != activeLoco) {
+        activeLoco = loco;
+        setLocoUI();
+      }
+    });
   });
 }
 
@@ -309,30 +373,40 @@ void loop() {
     #ifdef THROTTLE_DEBUG
     Serial.println(freeMemory());
     #endif
-    // Remap the touch point
-    tp = ts.getPoint(); 
-    tp.x = map(tp.x, 0, 240, 240, 0);
-    tp.y = map(tp.y, 0, 320, 320, 0);
-
-    if (rotated) { // Invert touch points if rotated
-      tp.x = 240 - tp.x;
-      tp.y = 320 - tp.y;
-    }
-
-    if (menu.contains(tp)) { // Menu press?
-      while (ts.touched()) {
-        delay(50);
+    Swipe swipe = NONE;
+    tp = getRemappedTSPoint();
+    delay(100);
+    if (ts.touched()) {
+      TS_Point tp2 = getRemappedTSPoint();
+      if (tp2.x - tp.x > 20) {
+        swipe = RIGHT;
+      } else if (tp.x - tp2.x > 20) {
+        swipe = LEFT;
       }
-      if (isMenuUI) { // If the menu is the current UI and we have an active loco we switch to the `Loco` UI
-        if (activeLoco != -1) {
-          isMenuUI = false;
-          setLocoUI();
+      if (swipe != NONE) {
+        while (ts.touched()) {
+          delay(10);
         }
-      } else { // If current UI isn't `Menu` then switch to that
-        setMenuUI();
       }
-    } else { // Send the touch to the active UI
-      activeUI->touch(tp.x, tp.y, []() { return ts.touched(); });
+    }
+    if (swipe == NONE) {
+      if (menu.contains(tp)) { // Menu press?
+        while (ts.touched()) {
+          delay(50);
+        }
+        if (isMenuUI) { // If the menu is the current UI and we have an active loco we switch to the `Loco` UI
+          if (activeLoco != -1) {
+            isMenuUI = false;
+            setLocoUI();
+          }
+        } else { // If current UI isn't `Menu` then switch to that
+          setMenuUI();
+        }
+      } else { // Send the touch to the active UI
+        activeUI->touch(tp.x, tp.y, []() { return ts.touched(); });
+      }
+    } else {
+      activeUI->swipe(swipe);
     }
   } else if (encoder.read() != 0) { // Encoder change, send to active UI
     int32_t read = encoder.read();

@@ -4,6 +4,12 @@
 #include <Arduino.h>
 #include <Adafruit_SPITFT.h>
 
+enum Swipe : uint8_t {
+  NONE,
+  LEFT,
+  RIGHT
+};
+
 /**
  * @brief UI encoder rotation
  */
@@ -42,6 +48,12 @@ class UI {
      * @return int8_t 
      */
     virtual int8_t touch(uint16_t x, uint16_t y, Touched touched);
+        /**
+     * @brief Swipe gesture detected
+     * 
+     * @param swipe 
+     */
+    virtual void swipe(Swipe swipe);
     /**
      * @brief Encoder rotated
      * 

@@ -50,15 +50,17 @@ class FunctionButton : public TouchButton {
 
 class Loco : public UI {
   public:
+    using Swiped = void(*)(Swipe);
     /**
      * @brief Construct a new `Loco` UI object
      * 
      * @param tft 
      * @param sd 
      * @param dcc 
-     * @param loco 
+     * @param loco
+     * @param swiped
      */
-    Loco(Adafruit_SPITFT *tft, SdFat *sd, DCCEx *dcc, LocoState *loco);
+    Loco(Adafruit_SPITFT *tft, SdFat *sd, DCCEx *dcc, LocoState *loco, Swiped swiped);
     /**
      * @brief Destroy the `Loco` UI object
      */
@@ -72,6 +74,12 @@ class Loco : public UI {
      * @return int8_t 
      */
     int8_t touch(uint16_t x, uint16_t y, Touched touched);
+    /**
+     * @brief Handle UI swipe
+     * 
+     * @param swipe 
+     */
+    void swipe(Swipe swipe);
     /**
      * @brief Handle UI encoder rotation
      * 
@@ -97,6 +105,10 @@ class Loco : public UI {
      * @brief Pointer to `LocoState` object
      */
     LocoState *_loco;
+    /**
+     * @brief 
+     */
+    Swiped _swiped;
     /**
      * @brief Loco config JSON document
      */
