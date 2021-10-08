@@ -58,7 +58,7 @@ In `void setup()` you'll need to start the serial port you decide to use, e.g. `
 ## Loco config
 The JSON file name is the loco address, e.g. `1234.json` has the name and function mapping for a loco on address #1234.
 
-```json
+```js
 {
   /* loco name/description, max 20 characters */
   "name": "00000000000000000000",
@@ -109,7 +109,7 @@ This needs to be in the `fns` directory and its name used as the value for the `
 
 These configs only need the rows and function declarations.
 e.g.
-```json
+```js
 [
   [
     {
