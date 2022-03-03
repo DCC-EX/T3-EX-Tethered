@@ -40,6 +40,7 @@ Make sure you connect the GND's of both the throttle and CS together too.
 CS v4 made it much simpler to add an extra `Serial` input.
 You just need to add which serial to use to your `config.h` file, e.g.
 `#define SERIAL1_COMMANDS`
+
 **Command Station v3.1**
 The CS sketch will need a couple lines of extra code to handle the throttle.
 Just before `void setup()` you'll need to create a new parser object, `DCCEXParser serialParser2;`.
