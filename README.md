@@ -36,6 +36,11 @@ Don't connect the throttle via USB at the same time as being powered by the 5v p
 The throttle uses `Serial2` (Pins 16 & 17), you'll need to connect these to a Serial port on the CS (If the CS is a Mega there's 3 to choose from).
 Make sure you connect the GND's of both the throttle and CS together too.
 
+**Command Station v4**
+CS v4 made it much simpler to add an extra `Serial` input.
+You just need to add which serial to use to your `config.h` file, e.g.
+`#define SERIAL1_COMMANDS`
+**Command Station v3.1**
 The CS sketch will need a couple lines of extra code to handle the throttle.
 Just before `void setup()` you'll need to create a new parser object, `DCCEXParser serialParser2;`.
 In `void setup()` you'll need to start the serial port you decide to use, e.g. `Serial1.begin(115200);` then in `void loop()` you'll need to tell the serial parser to handle the serial, e.g. `serialParser2.loop(Serial1);`
