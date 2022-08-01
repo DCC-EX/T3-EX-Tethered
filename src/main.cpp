@@ -17,7 +17,7 @@
 #include <Loco.h>
 #include <Program.h>
 
-#define THROTTLE_DEBUG
+// #define THROTTLE_DEBUG
 
 // Pins
 const uint8_t TFT_CS = 10;

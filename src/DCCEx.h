@@ -33,7 +33,7 @@ class DCCEx  {
      * @param serial The serial interface to use
      * @param timeout Timeout for the serial interface
      */
-    DCCEx(HardwareSerial *serial, uint16_t timeout = 2500);
+    DCCEx(HardwareSerial *serial, uint16_t timeout = 5000);
     /**
      * @brief Some CS commands send a response we don't use so we need to clear the input buffer
      */

@@ -95,14 +95,13 @@ int16_t DCCEx::readAddress() {
   _serial->println(F("<R>"));
 
   MatchState ms(buf, sizeof(buf));
-  // char pattern[13];
-  // strncpy_P(pattern, PSTR("<r (%-?%d+)>"), sizeof(pattern));
   char pattern[10];
   strncpy_P(pattern, PSTR("<r (%d+)>"), sizeof(pattern));
 
   if (readCSResponse(buf, sizeof(buf) - 1) && ms.Match(pattern) == REGEXP_MATCHED) {
     return (int16_t)strtol(ms.capture[0].init, (char **)NULL, 10);
   }
+  
   return -1;
 }
 
@@ -112,7 +111,7 @@ bool DCCEx::writeCVByte(uint16_t cv, uint8_t value) {
   _serial->println(buf);
 
   memset(buf, 0, sizeof(buf));
-  MatchState ms(buf);
+  MatchState ms(buf, sizeof(buf));
   char pattern[27];
   strncpy_P(pattern, PSTR("<r12345|32767|(%d+) (%d+)>"), sizeof(pattern));
 
@@ -147,7 +146,7 @@ bool DCCEx::writeCVBit(uint16_t cv, uint8_t bit, bool value) {
   _serial->println(buf);
 
   memset(buf, 0, sizeof(buf));
-  MatchState ms(buf);
+  MatchState ms(buf, sizeof(buf));
   char pattern[33];
   strncpy_P(pattern, PSTR("<r12345|32767|(%d+) (%d+) (%d+)>"), sizeof(pattern));
 
